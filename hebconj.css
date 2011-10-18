@@ -22,7 +22,7 @@ td,th {
   border-collapse: collapse;
   border:          1px solid #000;
   padding:         0 12px 4px 12px;
-  font:            22px georgia; }
+  font:            1.44em georgia; }
 th { font:bold 1.25em georgia; background: #eee; width: 80px; }
 tr#first th { background: #ffffd6; font-size: 20px; font-weight: normal; }
 .b { display: none; }

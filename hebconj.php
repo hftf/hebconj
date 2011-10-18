@@ -24,10 +24,32 @@ function conjugate($row,$verb_root,$tense_index,$pron_index) {
   $rules=split(",",$rulestext);
   $rule=@$rules[10*$tense_index+$pron_index];
   $rep=array('פ'=>substr($verb_root,0,2),'ע'=>substr($verb_root,2,2),'ל'=>substr($verb_root,4,2));
-  return ($verb_root)?strtr($rule,$rep):"";
+  $return = ($verb_root)?strtr($rule,$rep):"";
+  return fix_sofit($return);
+}
+function fix_sofit($w) {
+  global $sofit1, $sofit2;
+  //echo '['.preg_replace(array_keys($sofit1), array_values($sofit1), $w).']<br>';
+  return preg_replace(array_keys($sofit2), array_values($sofit2), preg_replace(array_keys($sofit1), array_values($sofit1), $w));
+}
+
+$sofit = array(
+    "כ" => "ך",
+    "מ" => "ם",
+    "נ" => "ן",
+    "פ" => "ף",
+    "צ" => "ץ",
+);
+$sofit1 = array(); $sofit2 = array();
+$b = '\p{L}';
+$d = '\x{0590}-\x{05C7}';
+foreach ($sofit as $s => $S) {
+  $sofit1['/' . $s . '([' . $d . ']*([^' . $b . $d . ']|$))/u'] = $S . '$1';
+  $sofit2['/' . $S . '([' . $d . ']*[' . $b . '])/u'] = $s . '$1';
 }
 
 $verb_root=escapedata(urldecode((isset($_GET["verb_root"]))?$_GET["verb_root"]:""));
+$verb_root=fix_sofit($verb_root);
 $tense_id= escapedata((isset($_GET["tense_id"]))?$_GET["tense_id"]:"");
 $pronouns= array("אֲנִי<br /><br />","אַתָּה","אַתְּ","הוּא","הִיא","אֲנַחְנוּ<br /><br />","אַתֶּם","אַתֶּן","הֵם","הֵן");
 $tenses=   array("הוֹוֶה","עָבָר","עָתִיד","צִוּוּי");
@@ -70,7 +92,22 @@ $tense_ops=array(
     else if (empty($row['table_rule']))
       echo "  <p><strong>The conjugation rules for the verb you entered has not yet been inserted in the database.</strong></p>\n";
     else {
-      echo "  <p style=\"position:absolute;\">Verb ID: <strong>{$row["verb_id"]}</strong><br />Table ID: <strong>{$row["table_id"]}</strong><br />Tense ID: <strong>{$row["tense_id"]}</strong></p>\n";
+      echo "  <div style=\"position:absolute;\"><p>Verb ID: <strong>{$row["verb_id"]}</strong><br />Table ID: <strong>{$row["table_id"]}</strong><br />Tense ID: <strong>{$row["tense_id"]}</strong></p>\n";
+
+    $verbs_in_same_table = mysql_query('SELECT verb_id, verb_root, tense_id FROM verbs WHERE table_id = "' . $row['table_id'] . '" AND verb_id != "' . $row['verb_id'] . '" ORDER BY verb_id');
+    if ($n = mysql_num_rows($verbs_in_same_table)) {
+        echo '<hr style="border-bottom: 0;" /><div style="font-size: 0.9em;"><p>Other verbs in this table:</p>';
+        echo '<ul lang="he" style="list-style: none; margin-left: 0; padding-left: 0; direction: rtl; -webkit-column-count: 3; -moz-column-count: 3;">';
+        $i = 0;
+        while (($v = mysql_fetch_assoc($verbs_in_same_table)) && $i++ < 27) {
+            echo '<li><a href="hebconj.php?verb_root=' . urlencode($v['verb_root']) . '&amp;tense_id=' . $v['tense_id'] . '">' . $v['verb_root'] . '</a></li>';
+        }
+        echo '</ul>';
+        if ($n - $i) echo '<p>&hellip;plus ' . ($n - $i) . ' more</p>';
+        echo '</div>';
+    }
+    echo '</div>';
+    
 ?>
   <div lang="he"><table id="table" cellspacing="0" cellpadding="0" border="0">
    <tr id="first">
