@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <head>
+  <link href="/css.css" type="text/css" rel="stylesheet" />
+  <link href="hebconj.css" type="text/css" rel="stylesheet" />
+  <meta http-equiv="Content-Type" content="text/xhtml; charset=utf-8" />
+  <title>Hebrew Verb Conjugator</title>
+ </head>
+ <body>
+<?php
+
+//  str_replace(array('A', 'B', 'C'), array('C', 'D', 'E'), 'ABCABC')
+//  str="ABCABC"; rep={A:'C', B:'D', C:'E'}; str.replace(/A|B|C/g, function(x){if(x in rep)return rep[x]})
+
+
+include "inc/db.php";
+mysql_select_db("hebconj");
+mysql_query("SET NAMES 'utf8'");
+
+function escapedata($data)  { return mysql_real_escape_string(trim(stripslashes($data))); }
+function conjugate($row,$verb_root,$tense_index,$pron_index) {
+  $rulestext=$row["table_rule"];
+  $rules=split(",",$rulestext);
+  $rule=@$rules[10*$tense_index+$pron_index];
+  $rep=array('פ'=>substr($verb_root,0,2),'ע'=>substr($verb_root,2,2),'ל'=>substr($verb_root,4,2));
+  return ($verb_root)?strtr($rule,$rep):"";
+}
+
+$verb_root=escapedata(urldecode((isset($_GET["verb_root"]))?$_GET["verb_root"]:""));
+$tense_id= escapedata((isset($_GET["tense_id"]))?$_GET["tense_id"]:"");
+$pronouns= array("אֲנִי<br /><br />","אַתָּה","אַתְּ","הוּא","הִיא","אֲנַחְנוּ<br /><br />","אַתֶּם","אַתֶּן","הֵם","הֵן");
+$tenses=   array("הוֹוֶה","עָבָר","עָתִיד","צִוּוּי");
+$tense_ops=array(
+  1=>array("desc"=>"pa'al    - simple active"    ,"tense_name"=>"פָּעַל",  "hc"=>"קל"), //ʿ
+  2=>array("desc"=>"nif'al   - simple passive"   ,"tense_name"=>"נִפְעַל", "hc"=>"נפ"),
+  3=>array("desc"=>"pi'el    - intensive active" ,"tense_name"=>"פִּעֵל",  "hc"=>"פי"),
+  4=>array("desc"=>"pu'al    - intensive passive","tense_name"=>"פֻּעַל",  "hc"=>"פו"),
+  5=>array("desc"=>"hitpa'el - reflexive"        ,"tense_name"=>"הִתְפַּעֵל","hc"=>"הת"),
+  6=>array("desc"=>"hif'il   - causative active" ,"tense_name"=>"הִפְעִיל", "hc"=>"הפ"),
+  7=>array("desc"=>"huf'al   - causative passive","tense_name"=>"הֻפְעַל", "hc"=>"הו"));
+
+?>
+  <p><a href="index.php">Return</a> - <strong><a href="hebconj-list.php">List of Hebrew Verbs</a></strong></p>
+
+  <form id="hebconj" method="get" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+   <p style="text-align:center;" lang="he">
+    <span lang="he" class="tm">שֹׁרֶשׁ: </span>
+    <input type="text" name="verb_root" id="verb_root" lang="he" value="<?php echo $verb_root; ?>" />
+
+    <select name="tense_id" style="font-size:1.25em;">
+<?php  foreach ($tense_ops as $tense_op_id=>$tense_op)
+              echo "     <option value=\"$tense_op_id\"",($tense_id==$tense_op_id)?" selected=\"selected\"":"                    "," title=\"{$tense_op["desc"]}\">{$tense_op["tense_name"]}</option>\n";
+?>
+    </select>
+
+    <input type="submit" value="Conjugate" /><br />
+   </p>
+  </form>
+  
+<?php
+
+  if (empty($verb_root) || empty($tense_id))
+    echo "  <p><strong>Please enter a verb to conjugate.</strong></p>\n";
+  else {
+    $result=mysql_query("SELECT verb_id,verbs.table_id,verbs.tense_id,tense_name,verb_root,table_rule FROM verbs,tenses,tables WHERE verbs.tense_id=$tense_id AND verbs.table_id=tables.table_id AND verbs.tense_id=tenses.tense_id AND verb_root LIKE '$verb_root'"); 
+    $row=mysql_fetch_assoc($result);
+    if (empty($row))
+      echo "  <p><strong>The verb you entered was not found, or possibly has not yet been inserted in the database.</strong> ",mysql_error(),"</p>\n";
+    else if (empty($row['table_rule']))
+      echo "  <p><strong>The conjugation rules for the verb you entered has not yet been inserted in the database.</strong></p>\n";
+    else {
+      echo "  <p style=\"position:absolute;\">Verb ID: <strong>{$row["verb_id"]}</strong><br />Table ID: <strong>{$row["table_id"]}</strong><br />Tense ID: <strong>{$row["tense_id"]}</strong></p>\n";
+?>
+  <div lang="he"><table id="table" cellspacing="0" cellpadding="0" border="0">
+   <tr id="first">
+    <th id="shoresh">שֹׁרֶשׁ:&nbsp;<strong><?php echo $verb_root; ?></strong></th>
+    <th id="gizrah" colspan="3">גִזְרָה</th>
+    <th id="binyan">בִּנְיָן:&nbsp;<strong><?php echo $row["tense_name"]; ?></strong></th>
+   </tr>
+   <tr>
+    <th></th>
+    <th>הוֹוֶה</th>
+    <th>עָבָר</th>
+    <th>עָתִיד</th>
+    <th>צִוּוּי</th>
+   </tr>
+<?php
+
+    function he($data) { return urlencode(strrev(hebrev(iconv("UTF-8", "ISO-8859-8", $data)))); }
+
+    $html=iconv("ISO-8859-8","UTF-8",file_get_contents("http://wassist.cs.technion.ac.il/~danken/cgi-bin/cilla.cgi?root=".he($verb_root)."&binyan=".he($tense_ops[$tense_id]["hc"])));
+    $table = substr($html,strpos($html,"<TABLE"),strpos($html,"</TABLE")-strpos($html,"<TABLE")+8);
+
+    $result = array();
+    for ($i = 1; $i <= 10; $i ++) {
+      $result[$i] = array();
+      for ($j = 0; $j < 5; $j ++) {
+        $result[$i][$j] = '';
+      }
+    }
+    $table = preg_replace('#</td><tr>#si','</td></tr>',$table);
+    $table = preg_replace('#(?<=.)(?<!</td>)</tr>#mi','</td></tr>',$table);
+    
+    preg_match_all('#(?<=<tr>).*?(?<=</tr>)#si',$table,$trarray);
+    for ($i = 1; $i < count($trarray[0]); $i++) {
+      preg_match_all('#(?<=<td>)[^<]*(?=</td>)#i',$trarray[0][$i],$rowarray);
+      for ($j = 0; $j < count($rowarray[0]); $j++) {
+        if ($j == 2) $jj = 1;
+        else if ($j == 1) $jj = 2;
+        else $jj = $j;
+        $result[$i][$j]=$rowarray[0][$jj];
+      }
+    }
+    $result[1][1] = $result[2][1] . '<br />' . $result[3][1];
+    $result[4][1] = $result[2][1];
+    $result[5][1] = $result[3][1];
+    $result[6][1] = $result[7][1] . '<br />' . $result[8][1];
+    $result[9][1] = $result[7][1];
+    $result[10]=array('',$result[8][1],$result[9][2],$result[8][3],'');
+
+
+      foreach ($pronouns as $pron_index=>$pronoun) {
+        echo "   <tr>\n     <th>$pronoun</th>\n";
+        foreach ($tenses as $tense_index=>$tense) {
+          //echo "    <td id=\"v$tense_index$pron_index\">",conjugate($row,$verb_root,$tense_index,$pron_index),"</td>\n";
+          echo "    <td id=\"v$tense_index$pron_index\"><span class=\"a\">",conjugate($row,$verb_root,$tense_index,$pron_index),"</span><span class=\"b\">",$result[$pron_index+1][$tense_index+1],"</span></td>\n";
+        }
+       echo "   </tr>\n";
+      }
+
+?>
+  </table>
+  <p><br /></p>
+
+<?php
+  echo $table;
+?>
+  </div>
+<?php }} include("inc/lm.php"); /*lmp("hebconj.php");*/ include("inc/ga.php"); ?>
+</body>
+</html>

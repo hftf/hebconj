@@ -1,0 +1,30 @@
+[lang="he"], [lang="he"] * { font-family: Narkisim, "Lucida Grande", "SBL Hebrew", David, "Microsoft Sans Serif", "Times New Roman"; direction: rtl; }
+[lang="he"] { font-size: 1.25em; }
+[lang="he"] strong { font-weight: bold; font-style: normal; }
+input[type="text"] {
+  font-size:       2em;
+  border:          0;
+  border-bottom:   1px solid #666;
+  background:      transparent;
+  padding:         1px 6px;
+  width:           80px;
+  text-align:      center;
+  color:           #f33; }
+input[type="submit"] {
+  font:            1em lucida sans; }
+table {
+  background:      #f8f8ff;
+  border:          1px solid #000;
+  margin:          1em auto;
+  width:           auto; }
+td,th {
+  vertical-align:  top;
+  border-collapse: collapse;
+  border:          1px solid #000;
+  padding:         0 12px 4px 12px;
+  font:            22px georgia; }
+th { font:bold 1.25em georgia; background: #eee; width: 80px; }
+tr#first th { background: #ffffd6; font-size: 20px; font-weight: normal; }
+.b { display: none; }
+td:hover .a { display: none; }
+td:hover .b { display: inline; }
