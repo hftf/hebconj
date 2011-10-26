@@ -18,35 +18,7 @@ include "inc/db.php";
 mysql_select_db("hebconj");
 mysql_query("SET NAMES 'utf8'");
 
-function escapedata($data)  { return mysql_real_escape_string(trim(stripslashes($data))); }
-function conjugate($row,$verb_root,$tense_index,$pron_index) {
-  $rulestext=$row["table_rule"];
-  $rules=split(",",$rulestext);
-  $rule=@$rules[10*$tense_index+$pron_index];
-  $rep=array('פ'=>substr($verb_root,0,2),'ע'=>substr($verb_root,2,2),'ל'=>substr($verb_root,4,2));
-  $return = ($verb_root)?strtr($rule,$rep):"";
-  return fix_sofit($return);
-}
-function fix_sofit($w) {
-  global $sofit1, $sofit2;
-  //echo '['.preg_replace(array_keys($sofit1), array_values($sofit1), $w).']<br>';
-  return preg_replace(array_keys($sofit2), array_values($sofit2), preg_replace(array_keys($sofit1), array_values($sofit1), $w));
-}
-
-$sofit = array(
-    "כ" => "ך",
-    "מ" => "ם",
-    "נ" => "ן",
-    "פ" => "ף",
-    "צ" => "ץ",
-);
-$sofit1 = array(); $sofit2 = array();
-$b = '\p{L}';
-$d = '\x{0590}-\x{05C7}';
-foreach ($sofit as $s => $S) {
-  $sofit1['/' . $s . '([' . $d . ']*([^' . $b . $d . ']|$))/u'] = $S . '$1';
-  $sofit2['/' . $S . '([' . $d . ']*[' . $b . '])/u'] = $s . '$1';
-}
+include 'hebconj-functions.php';
 
 $verb_root=escapedata(urldecode((isset($_GET["verb_root"]))?$_GET["verb_root"]:""));
 $verb_root=fix_sofit($verb_root);
@@ -124,8 +96,6 @@ $tense_ops=array(
    </tr>
 <?php
 
-    function he($data) { return urlencode(strrev(hebrev(iconv("UTF-8", "ISO-8859-8", $data)))); }
-
     $html=iconv("ISO-8859-8","UTF-8",file_get_contents("http://wassist.cs.technion.ac.il/~danken/cgi-bin/cilla.cgi?root=".he($verb_root)."&binyan=".he($tense_ops[$tense_id]["hc"])));
     $table = substr($html,strpos($html,"<TABLE"),strpos($html,"</TABLE")-strpos($html,"<TABLE")+8);
 
@@ -161,7 +131,12 @@ $tense_ops=array(
         echo "   <tr>\n     <th>$pronoun</th>\n";
         foreach ($tenses as $tense_index=>$tense) {
           //echo "    <td id=\"v$tense_index$pron_index\">",conjugate($row,$verb_root,$tense_index,$pron_index),"</td>\n";
-          echo "    <td id=\"v$tense_index$pron_index\"><span class=\"a\">",conjugate($row,$verb_root,$tense_index,$pron_index),"</span><span class=\"b\">",$result[$pron_index+1][$tense_index+1],"</span></td>\n";
+          $my_conjugated = conjugate($row,$verb_root,$tense_index,$pron_index);
+          $hspell_conjugated = $result[$pron_index+1][$tense_index+1];
+          $class = '';
+          if (niqqud_to_ktiv_male($my_conjugated) != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
+            $class .= ' hspell-nomatch';
+          echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\"><span class=\"a\">",$my_conjugated,"</span><span class=\"b\">",$hspell_conjugated,"</span></td>\n";
         }
        echo "   </tr>\n";
       }
