@@ -1,0 +1,17 @@
+http://www.cs.technion.ac.il/~erelsgl/java1/milon/tavniot.ma
+
+http://www.code972.com/blog/hebmorph/
+
+https://github.com/synhershko/HebMorph/blob/master/java/hebmorph/src/hebmorph/LookupTolerators.java
+
+http://hebrew-academy.huji.ac.il/hahlatot/MissingVocalizationSpelling/Pages/ikkar.aspx
+
+http://cs.haifa.ac.il/~shuly/teaching/06/lab/syllabus.pdf
+
+http://www.unilang.org/viewtopic.php?f=34&t=12798
+
+http://en.wikipedia.org/wiki/Ktiv_hasar_niqqud
+
+http://www.cs.uky.edu/~raphael/linguistics/hebrew.katr
+
+http://www.mesacc.edu/~tomshoemaker/fall11/hebrew/grammar.html
