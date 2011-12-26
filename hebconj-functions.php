@@ -17,16 +17,26 @@ function fix_sofit($w) {
 function strip_niqqud($w) {
   return strtr($w, $GLOBALS['rep2']);
 }
+function devocalize($word) {
+  //$arg = escapeshellarg($word);
+  $arg = $word;
+  $q = "python Devocalizer/main.py -p '" . json_encode($arg) . "'";
+  $s = shell_exec($q);
+  return json_decode($s);
+}
+
 function niqqud_to_ktiv_male($w) {
   global $b, $d, $l;
   $r = preg_replace('/ֻ/', 'ו', $w);
-  //echo str_replace('<br />', '/', $r) . '&larr;';
-  $r = preg_replace('/([^ו])ֹ([אהו][' . $l . '])/u', '$1$2', $r);
-  //echo str_replace('<br />', '/', $r) . '&larr;';
-  $r = preg_replace('/([^ו])ֹ/', '$1ו', $r);
-  //echo str_replace('<br />', '/', $r) . '&larr;';
+  //echo str_replace('<br />', '/', $r) . ' &larr; ';
+  $r = preg_replace('/([^ו])[ֹֺ]([אהו][\b' . $l . '])/u', '$1$2', $r);
+  //echo str_replace('<br />', '/', $r) . ' &larr; ';
+  $r = preg_replace('/([^ו])[ֹֺ]/u', '$1ו', $r);
+  //echo str_replace('<br />', '/', $r) . ' &larr; ';
+  $r = preg_replace('/[ֹֺ]/u', '', $r);
+  //echo str_replace('<br />', '/', $r) . ' &larr; ';
   $r = preg_replace('/([' . $b . $l . $d . '])(י[' . $d . '])/u', '$1$2י', $r);
-  //echo str_replace('<br />', '/', $r) . '&larr;';
+  //echo str_replace('<br />', '/', $r) . ' &larr; ';
   $r = preg_replace('/([^\x{05d9}])ִ([^\x{05d9}]([' . $d . ']*))/u', '$1י$2', $r);
   $r = strip_niqqud($r);
   //echo str_replace('<br />', '/', $r) . '<br>';
