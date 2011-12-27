@@ -6,6 +6,9 @@ function conjugate($row,$verb_root,$tense_index,$pron_index) {
   $rules=split(",",$rulestext);
   $rule=@$rules[10*$tense_index+$pron_index];
   switch (strlen($verb_root)/2) {
+    case 5:
+      $rep=array('פ'=>substr($verb_root,0,2),'ק'=>substr($verb_root,2,2),'ר'=>substr($verb_root,4,2),'ע'=>substr($verb_root,6,2),'ל'=>substr($verb_root,8,2));
+      break;
     case 4:
       $rep=array('פ'=>substr($verb_root,0,2),'ק'=>substr($verb_root,2,2),'ע'=>substr($verb_root,4,2),'ל'=>substr($verb_root,6,2));
       break;
