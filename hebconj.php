@@ -81,7 +81,9 @@ $tense_ops=array(
     echo '</div>';
     
 ?>
-  <div lang="he"><table id="table" cellspacing="0" cellpadding="0" border="0">
+  <div lang="he">
+  <table id="table" cellspacing="0" cellpadding="0" border="0">
+   <caption><?php echo conjugate($row,$verb_root,4,0); ?></caption>
    <tr id="first">
     <th id="shoresh">שֹׁרֶשׁ:&nbsp;<strong><?php echo $verb_root; ?></strong></th>
     <th id="gizrah" colspan="3">גִזְרָה</th>
@@ -134,7 +136,7 @@ $tense_ops=array(
           $my_conjugated = conjugate($row,$verb_root,$tense_index,$pron_index);
           $hspell_conjugated = $result[$pron_index+1][$tense_index+1];
           $class = '';
-          if (niqqud_to_ktiv_male($my_conjugated) != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
+          if (devocalize($my_conjugated) != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
             $class .= ' hspell-nomatch';
           echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\"><span class=\"a\">",$my_conjugated,"</span><span class=\"b\">",$hspell_conjugated,"</span></td>\n";
         }
