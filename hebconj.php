@@ -57,7 +57,7 @@ $tense_ops=array(
   if (empty($verb_root) || empty($tense_id))
     echo "  <p><strong>Please enter a verb to conjugate.</strong></p>\n";
   else {
-    $result=mysql_query("SELECT verb_id,verbs.table_id,verbs.tense_id,tense_name,verb_root,table_rule FROM verbs,tenses,tables WHERE verbs.tense_id=$tense_id AND verbs.table_id=tables.table_id AND verbs.tense_id=tenses.tense_id AND verb_root LIKE '$verb_root'"); 
+    $result=mysql_query("SELECT verb_id,verbs.table_id,verbs.tense_id,tense_name,verb_root,table_rule FROM tenses,verbs LEFT OUTER JOIN tables ON verbs.table_id=tables.table_id WHERE verbs.tense_id=$tense_id AND verbs.tense_id=tenses.tense_id AND verb_root LIKE '$verb_root'"); 
     $row=mysql_fetch_assoc($result);
     if (empty($row))
       echo "  <p><strong>The verb you entered was not found, or possibly has not yet been inserted in the database.</strong> ",mysql_error(),"</p>\n";
@@ -98,9 +98,11 @@ $tense_ops=array(
    </tr>
 <?php
 
-    $html=iconv("ISO-8859-8","UTF-8",file_get_contents("http://wassist.cs.technion.ac.il/~danken/cgi-bin/cilla.cgi?root=".he($verb_root)."&binyan=".he($tense_ops[$tense_id]["hc"])));
+    $hspell_url = "http://wassist.cs.technion.ac.il/~danken/cgi-bin/cilla.cgi?root=".he($verb_root)."&binyan=".he($tense_ops[$tense_id]["hc"]);
+    $html=iconv("ISO-8859-8","UTF-8",file_get_contents($hspell_url));
     $table = substr($html,strpos($html,"<TABLE"),strpos($html,"</TABLE")-strpos($html,"<TABLE")+8);
 
+    // Make a 2-D array
     $result = array();
     for ($i = 1; $i <= 10; $i ++) {
       $result[$i] = array();
@@ -108,16 +110,25 @@ $tense_ops=array(
         $result[$i][$j] = '';
       }
     }
+    // Fix invalid table HTML
     $table = preg_replace('#</td><tr>#si','</td></tr>',$table);
     $table = preg_replace('#(?<=.)(?<!</td>)</tr>#mi','</td></tr>',$table);
+    // Swap avar and hoveh table cells
+    $table = preg_replace('#<tr><td>(.*?)</td><td>(.*?)</td><td>(.*?)</td>#mi','<tr><td>$1</td><td>$3</td><td>$2</td>',$table);
+    // Put link in first cell
+    $table = preg_replace('#<tr><td></td>#','<tr><td><a style="font: 0.7em Lucida Grande;" href="' . $hspell_url . '">Hspell</a></td>',$table);
     
+    
+    // Scrape table cells into array
     preg_match_all('#(?<=<tr>).*?(?<=</tr>)#si',$table,$trarray);
     for ($i = 1; $i < count($trarray[0]); $i++) {
       preg_match_all('#(?<=<td>)[^<]*(?=</td>)#i',$trarray[0][$i],$rowarray);
       for ($j = 0; $j < count($rowarray[0]); $j++) {
-        if ($j == 2) $jj = 1;
-        else if ($j == 1) $jj = 2;
-        else $jj = $j;
+        // The code below not needed since now swapping avar and hoveh table cells
+        //if ($j == 2) $jj = 1;
+        //else if ($j == 1) $jj = 2;
+        //else
+          $jj = $j;
         $result[$i][$j]=$rowarray[0][$jj];
       }
     }
@@ -136,9 +147,10 @@ $tense_ops=array(
           $my_conjugated = conjugate($row,$verb_root,$tense_index,$pron_index);
           $hspell_conjugated = $result[$pron_index+1][$tense_index+1];
           $class = '';
-          if (devocalize($my_conjugated) != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
+          $devocalized_my_conjugated = devocalize($my_conjugated);
+          if ($devocalized_my_conjugated != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
             $class .= ' hspell-nomatch';
-          echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\"><span class=\"a\">",$my_conjugated,"</span><span class=\"b\">",$hspell_conjugated,"</span></td>\n";
+          echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\" title=\"" . str_replace('<br />',"\n",$devocalized_my_conjugated) . "\"><span class=\"a\">",$my_conjugated,"</span><span class=\"b\">",$hspell_conjugated,"</span></td>\n";
         }
        echo "   </tr>\n";
       }

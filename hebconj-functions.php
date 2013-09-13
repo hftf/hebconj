@@ -3,7 +3,7 @@
 function escapedata($data)  { return mysql_real_escape_string(trim(stripslashes($data))); }
 function conjugate($row,$verb_root,$tense_index,$pron_index) {
   $rulestext=$row["table_rule"];
-  $rules=split(",",$rulestext);
+  $rules=explode(",",$rulestext);
   $rule=@$rules[10*$tense_index+$pron_index];
   switch (strlen($verb_root)/2) {
     case 5:
