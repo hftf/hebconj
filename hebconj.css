@@ -24,7 +24,7 @@ td,th {
   padding:         0 12px 4px 12px;
   font:            1.44em georgia; }
 th { font:bold 1.25em georgia; background: #eee; width: 80px; }
-tr#first th { background: #ffffd6; font-size: 20px; font-weight: normal; }
+tr#first th { background: #ffffd6; font-size: 1.33em; font-weight: normal; }
 .b { display: none; }
 td:hover .a { display: none; }
 td:hover .b { display: inline; }
