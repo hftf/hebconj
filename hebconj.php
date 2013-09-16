@@ -4,6 +4,7 @@
  <head>
   <link href="/css.css" type="text/css" rel="stylesheet" />
   <link href="hebconj.css" type="text/css" rel="stylesheet" />
+  <link href="colorful-diacritics/test.css" type="text/css" rel="stylesheet" />
   <meta http-equiv="Content-Type" content="text/xhtml; charset=utf-8" />
   <title>Hebrew Verb Conjugator</title>
  </head>
@@ -19,6 +20,9 @@ mysql_select_db("hebconj");
 mysql_query("SET NAMES 'utf8'");
 
 include 'hebconj-functions.php';
+
+$hspell_on = isset($_GET['hspell']);
+$color_on = isset($_GET['color']);
 
 $verb_root=escapedata(urldecode((isset($_GET["verb_root"]))?$_GET["verb_root"]:""));
 $verb_root=fix_sofit($verb_root);
@@ -81,9 +85,9 @@ $tense_ops=array(
     echo '</div>';
     
 ?>
-  <div lang="he">
+  <div lang="he" class="nohover">
   <table id="table" cellspacing="0" cellpadding="0" border="0">
-   <caption><?php echo conjugate($row,$verb_root,4,0); ?></caption>
+   <caption><?php echo conjugate($row,$verb_root,4,0, $color_on); ?></caption>
    <tr id="first">
     <th id="shoresh">שֹׁרֶשׁ:&nbsp;<strong><?php echo $verb_root; ?></strong></th>
     <th id="gizrah" colspan="3">גִזְרָה</th>
@@ -98,6 +102,7 @@ $tense_ops=array(
    </tr>
 <?php
 
+if ($hspell_on) {
     $hspell_url = "http://wassist.cs.technion.ac.il/~danken/cgi-bin/cilla.cgi?root=".he($verb_root)."&binyan=".he($tense_ops[$tense_id]["hc"]);
     $html=iconv("ISO-8859-8","UTF-8",file_get_contents($hspell_url));
     $table = substr($html,strpos($html,"<TABLE"),strpos($html,"</TABLE")-strpos($html,"<TABLE")+8);
@@ -138,19 +143,24 @@ $tense_ops=array(
     $result[6][1] = $result[7][1] . '<br />' . $result[8][1];
     $result[9][1] = $result[7][1];
     $result[10]=array('',$result[8][1],$result[9][2],$result[8][3],'');
-
+}
 
       foreach ($pronouns as $pron_index=>$pronoun) {
         echo "   <tr>\n     <th>$pronoun</th>\n";
         foreach ($tenses as $tense_index=>$tense) {
           //echo "    <td id=\"v$tense_index$pron_index\">",conjugate($row,$verb_root,$tense_index,$pron_index),"</td>\n";
           $my_conjugated = conjugate($row,$verb_root,$tense_index,$pron_index);
-          $hspell_conjugated = $result[$pron_index+1][$tense_index+1];
+          $my_conjugated_color = conjugate($row,$verb_root,$tense_index,$pron_index, $color_on);
+          if ($hspell_on)
+            $hspell_conjugated = $result[$pron_index+1][$tense_index+1];
           $class = '';
           $devocalized_my_conjugated = devocalize($my_conjugated);
-          if ($devocalized_my_conjugated != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
+          if ($hspell_on && $devocalized_my_conjugated != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
             $class .= ' hspell-nomatch';
-          echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\" title=\"" . str_replace('<br />',"\n",$devocalized_my_conjugated) . "\"><span class=\"a\">",$my_conjugated,"</span><span class=\"b\">",$hspell_conjugated,"</span></td>\n";
+          $meat = $my_conjugated_color;
+          if ($hspell_on)
+            $meat = '<span class=\"a\">" . $meat . "</span><span class=\"b\">" . $hspell_conjugated . "</span>';
+          echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\" title=\"" . str_replace('<br />',"\n",$devocalized_my_conjugated) . "\">$meat</td>\n";
         }
        echo "   </tr>\n";
       }
@@ -160,9 +170,10 @@ $tense_ops=array(
   <p><br /></p>
 
 <?php
-  echo $table;
+  if ($hspell_on) echo $table;
 ?>
   </div>
+  <script type="text/javascript" src="colorful-diacritics/test.js"></script>
 <?php }} include("inc/lm.php"); /*lmp("hebconj.php");*/ include("inc/ga.php"); ?>
 </body>
 </html>

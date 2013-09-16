@@ -1,10 +1,22 @@
 <?php
 
 function escapedata($data)  { return mysql_real_escape_string(trim(stripslashes($data))); }
-function conjugate($row,$verb_root,$tense_index,$pron_index) {
+function conjugate($row,$verb_root,$tense_index,$pron_index,$color = false) {
   $rulestext=$row["table_rule"];
   $rules=explode(",",$rulestext);
   $rule=@$rules[10*$tense_index+$pron_index];
+
+  if (strpos($rule, '<br />') > 0) {
+    $segs = explode('<br />', $rule);
+    foreach ($segs as &$seg)
+      $seg = conjugate_($seg, $verb_root, $tense_index, $pron_index, $color);
+    return implode('<br />', $segs);
+  }
+  else
+    return conjugate_($rule, $verb_root, $tense_index, $pron_index, $color);
+}
+
+function conjugate_($rule,$verb_root,$tense_index,$pron_index,$color = false) {
   switch (strlen($verb_root)/2) {
     case 5:
       $rep=array('פ'=>substr($verb_root,0,2),'ק'=>substr($verb_root,2,2),'ר'=>substr($verb_root,4,2),'ע'=>substr($verb_root,6,2),'ל'=>substr($verb_root,8,2));
@@ -16,10 +28,20 @@ function conjugate($row,$verb_root,$tense_index,$pron_index) {
       $rep=array('פ'=>substr($verb_root,0,2),'ע'=>substr($verb_root,2,2),'ל'=>substr($verb_root,4,2));
       break;
   }
+  $pos = array(); $rule_noMn = preg_replace('/\p{Mn}/u', '', $rule);
+  foreach (array('פ', 'ק', 'ר', 'ע', 'ל') as $let) {
+    $p = strpos($rule_noMn, $let);
+    if ($p !== false)
+      $pos[] = $p / 2;
+  }
   $return = ($verb_root)?strtr($rule,$rep):"";
   if ($tense_index == 4 && $pron_index == 0) // Infinitive
     $return = strtr($return,array('L'=>'ל'));
-  return fix_sofit($return);
+  $return = fix_sofit($return);
+
+  if ($color)
+      $return = '<span class="positions" data-positions="' . implode(',', $pos) . '">' . $return . '</span>';
+  return $return;
 }
 function fix_sofit($w) {
   global $sofit1, $sofit2;
