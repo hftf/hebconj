@@ -154,7 +154,8 @@ if ($hspell_on) {
           if ($hspell_on)
             $hspell_conjugated = $result[$pron_index+1][$tense_index+1];
           $class = '';
-          $devocalized_my_conjugated = devocalize($my_conjugated);
+          $devocalized_my_conjugated = niqqud_to_ktiv_male($my_conjugated);
+          //$devocalized_my_conjugated = devocalize($my_conjugated);
           if ($hspell_on && $devocalized_my_conjugated != $hspell_conjugated && str_replace('<br />', '', $hspell_conjugated) != '')
             $class .= ' hspell-nomatch';
           $meat = $my_conjugated_color;
