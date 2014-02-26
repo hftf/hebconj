@@ -1,4 +1,4 @@
-[lang="he"], [lang="he"] * { font-family: Narkisim, "Lucida Grande", "SBL Hebrew", David, "Microsoft Sans Serif", "Times New Roman"; direction: rtl; }
+[lang="he"], [lang="he"] * { font-family: "SBL Hebrew", Narkisim, "Lucida Grande", David, "Microsoft Sans Serif", "Times New Roman"; direction: rtl; }
 [lang="he"] { font-size: 1.25em; }
 [lang="he"] strong { font-weight: bold; font-style: normal; }
 input[type="text"] {
