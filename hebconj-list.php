@@ -16,86 +16,12 @@
 </head><body>
 <?php
 
-$setup=false;
-$semicolon=";";
-$printer=false;
 set_time_limit(0);
 
 include("inc/db.php");
 
-if ($setup) {
-  mysql_query("DROP DATABASE IF EXISTS hebconj");
-  mysql_query("CREATE DATABASE hebconj");
-}
 mysql_select_db("hebconj");
 mysql_query("SET NAMES \"utf8\"");
-if ($setup) {
-  mysql_query("CREATE TABLE verbs (
-    verb_id     INT NOT NULL AUTO_INCREMENT,
-    table_id    INT NOT NULL,
-    tense_id    INT NOT NULL,
-    verb_root   VARCHAR(16) NOT NULL,
-    verb_avar   VARCHAR(16) NULL,
-    verb_prep   VARCHAR(16) NULL,
-    PRIMARY KEY(verb_id))");
-  mysql_query("CREATE TABLE tenses (
-    tense_id    INT NOT NULL AUTO_INCREMENT,
-    tense_name  VARCHAR(16) NOT NULL,
-    PRIMARY KEY(tense_id))");
-  mysql_query("CREATE TABLE tables (
-    table_id    INT NOT NULL AUTO_INCREMENT,
-    table_rule  VARCHAR(512) NOT NULL,
-    PRIMARY KEY(table_id))");
-
-$tenses=array();
-$tense_indices=array(1,65,91,118,135,178,212,236);
-for($index=1;$index<8;$index++)
-  $tenses+=array_fill($tense_indices[$index-1],$tense_indices[$index]-$tense_indices[$index-1],$index);
-
-$tense_names=array("פָּעַל","נִפְעַל","פִּעֵל","פֻּעַל","הִתְפַּעֵל","הִפְעִיל","הֻפְעַל");
-
-include "hebconj-verbs.php";
-include "hebconj-tables.php";
-
-//echo "<h3>produces:</h3><pre style=\"margin-left:4em;line-height:1;\">";print_r($verbs);echo "</pre>";
-if($printer) echo "<h3>SQL queries</h3><pre>";
-
-if($printer) echo "DROP DATABASE IF EXISTS hebconj;
-CREATE DATABASE hebconj;
-USE hebconj;
-SET NAMES \"utf8\";
-CREATE TABLE verbs (
-  verb_id     INT NOT NULL AUTO_INCREMENT,
-  table_id    INT NOT NULL,
-  tense_id    INT NOT NULL,
-  verb_root   VARCHAR(16) NOT NULL,
-  PRIMARY KEY(verb_id));
-CREATE TABLE tenses (
-  tense_id    INT NOT NULL AUTO_INCREMENT,
-  tense_name  VARCHAR(16) NOT NULL,
-  PRIMARY KEY(tense_id));\n\n";
-
-foreach ($verbs as $table_index=>$table)
-  foreach ($table as $verb_index=>$verb) {
-    $query="INSERT INTO verbs (table_id,tense_id,verb_root) VALUES (".$table_index.",".$tenses[$table_index].",'".$verb."')".$semicolon;
-    if($setup) $result=mysql_query($query) or die(mysql_error());
-  if($printer) echo "\n$query",$semicolon;
-}
-
-foreach ($tense_names as $tense_id=>$tense_name) {
-  $query="INSERT INTO tenses (tense_name) VALUES ('".$tense_name."')";
-  if($setup) $result=mysql_query($query) or die(mysql_error());
-  if($printer) echo "\n$query",$semicolon;
-}
-
-foreach ($table_rules as $table_id=>$table_rule) {
-  $query="INSERT INTO tables (table_rule) VALUES ('".$table_rule."')";
-  if($setup) $result=mysql_query($query) or die(mysql_error());
-  if($printer) echo "\n$query",$semicolon;
-}
-
-if($printer) echo "</pre>";
-}
 
 ?>
 
