@@ -29,7 +29,10 @@ mysql_query("SET NAMES \"utf8\"");
 <p>The <strong>Hebrew Verb Conjugator</strong> is a work in progress. The following table includes almost all Hebrew verbs in each of the seven <a href='http://en.wikipedia.org/wiki/Binyan'>constructions</a>. Click on a verb in the <code>verb_root</code> column to conjugate it. Click on a column header to <a href='http://www.kryogenix.org/code/browser/sorttable/'>sort</a>. Only verbs in <em>Tables 1 through <?php $r=mysql_fetch_row(mysql_query("select count(*) from tables")); echo $r[0]; ?></em> without a <a href='http://en.wikipedia.org/wiki/Final_form'>sofit</a> currently work as expected, and only about <em><?php $r=mysql_fetch_row(mysql_query("select count(*) from verbs where verb_root != ''")); echo $r[0]; ?> of 2500</em> verbs have been included. The verbs of the as yet empty tables will be inserted soon, and more functionality will continually be added, so return here in the near future to see updates. Please note that the verbs have been manually entered, and may contain errors; if you find any, contact me at <a href='mailto:hangfromthefloor+hvc@gmail.com'>hangfromthefloor+hvc@gmail.com</a>.</p>
 
 <?php
-display_db_query("SELECT verb_id, verbs.table_id, verb_root, tense_name, verbs.tense_id, LENGTH(table_rule) FROM verbs LEFT JOIN tenses ON (verbs.tense_id=tenses.tense_id) LEFT JOIN tables ON (verbs.table_id = tables.table_id)",$connection);
+display_db_query("SELECT verb_id, verbs.table_id, verb_root, tense_name, tense_id, LENGTH(table_rule)
+  FROM verbs
+  LEFT JOIN tenses ON (verbs.table_id >= tenses.table_id_start AND verbs.table_id <= tenses.table_id_end)
+  LEFT JOIN tables ON (verbs.table_id = tables.table_id)",$connection);
 
 function display_db_query($query_string,$connection) {
   $result_id=mysql_query($query_string,$connection) or die(mysql_error());

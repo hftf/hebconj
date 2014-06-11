@@ -61,7 +61,7 @@ $tense_ops=array(
   if (empty($verb_root) || empty($tense_id))
     echo "  <p><strong>Please enter a verb to conjugate.</strong></p>\n";
   else {
-    $result=mysql_query("SELECT verb_id,verbs.table_id,verbs.tense_id,tense_name,verb_root,table_rule FROM tenses,verbs LEFT OUTER JOIN tables ON verbs.table_id=tables.table_id WHERE verbs.tense_id=$tense_id AND verbs.tense_id=tenses.tense_id AND verb_root LIKE '$verb_root'"); 
+    $result=mysql_query("SELECT verb_id,verbs.table_id,tense_id,tense_name,verb_root,table_rule FROM tenses,verbs LEFT OUTER JOIN tables ON verbs.table_id=tables.table_id WHERE tenses.tense_id=$tense_id AND verbs.table_id >= tenses.table_id_start AND verbs.table_id <= tenses.table_id_end AND verb_root LIKE '$verb_root'"); 
     $row=mysql_fetch_assoc($result);
     if (empty($row))
       echo "  <p><strong>The verb you entered was not found, or possibly has not yet been inserted in the database.</strong> ",mysql_error(),"</p>\n";
@@ -70,13 +70,13 @@ $tense_ops=array(
     else {
       echo "  <div style=\"position:absolute;\"><p>Verb ID: <strong>{$row["verb_id"]}</strong><br />Table ID: <strong>{$row["table_id"]}</strong><br />Tense ID: <strong>{$row["tense_id"]}</strong></p>\n";
 
-    $verbs_in_same_table = mysql_query('SELECT verb_id, verb_root, tense_id FROM verbs WHERE table_id = "' . $row['table_id'] . '" AND verb_id != "' . $row['verb_id'] . '" ORDER BY verb_id');
+    $verbs_in_same_table = mysql_query('SELECT verb_id, verb_root FROM verbs WHERE table_id = "' . $row['table_id'] . '" AND verb_id != "' . $row['verb_id'] . '" ORDER BY verb_id');
     if ($n = mysql_num_rows($verbs_in_same_table)) {
         echo '<hr style="border-bottom: 0;" /><div style="font-size: 0.9em;"><p>Other verbs in this table:</p>';
         echo '<ul lang="he" style="list-style: none; margin-left: 0; padding-left: 0; direction: rtl; -webkit-column-count: 3; -moz-column-count: 3;">';
         $i = 0;
         while (($v = mysql_fetch_assoc($verbs_in_same_table)) && $i++ < 27) {
-            echo '<li><a href="hebconj.php?verb_root=' . urlencode($v['verb_root']) . '&amp;tense_id=' . $v['tense_id'] . '">' . $v['verb_root'] . '</a></li>';
+            echo '<li><a href="hebconj.php?verb_root=' . urlencode($v['verb_root']) . '&amp;tense_id=' . $row['tense_id'] . '">' . $v['verb_root'] . '</a></li>';
         }
         echo '</ul>';
         if ($n - $i) echo '<p>&hellip;plus ' . ($n - $i) . ' more</p>';
