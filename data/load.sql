@@ -1,7 +1,9 @@
-DROP DATABASE IF EXISTS hebconj;
-CREATE DATABASE hebconj;
 USE hebconj;
 SET NAMES "utf8";
+
+DROP TABLE IF EXISTS verbs;
+DROP TABLE IF EXISTS tenses;
+DROP TABLE IF EXISTS tables;
 
 CREATE TABLE verbs (
     verb_id     INT NOT NULL AUTO_INCREMENT,
