@@ -27,4 +27,17 @@ FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n'
 LOAD DATA LOCAL INFILE "tenses.csv" INTO TABLE tenses CHARSET utf8
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE "tables.csv" INTO TABLE tables CHARSET utf8
-FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES;
+FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES
+(table_id,
+    @pas_s1, @pas_s2m, @pas_s2f, @pas_s3m, @pas_s3f, @pas_p1, @pas_p2m, @pas_p2f, @pas_p3m, @pas_p3f,
+    @pre_s1, @pre_s2m, @pre_s2f, @pre_s3m, @pre_s3f, @pre_p1, @pre_p2m, @pre_p2f, @pre_p3m, @pre_p3f,
+    @fut_s1, @fut_s2m, @fut_s2f, @fut_s3m, @fut_s3f, @fut_p1, @fut_p2m, @fut_p2f, @fut_p3m, @fut_p3f,
+    @imp_s1, @imp_s2m, @imp_s2f, @imp_s3m, @imp_s3f, @imp_p1, @imp_p2m, @imp_p2f, @imp_p3m, @imp_p3f,
+    @inf
+) SET table_rule = CONCAT_WS(',',
+    @pas_s1, @pas_s2m, @pas_s2f, @pas_s3m, @pas_s3f, @pas_p1, @pas_p2m, @pas_p2f, @pas_p3m, @pas_p3f,
+    @pre_s1, @pre_s2m, @pre_s2f, @pre_s3m, @pre_s3f, @pre_p1, @pre_p2m, @pre_p2f, @pre_p3m, @pre_p3f,
+    @fut_s1, @fut_s2m, @fut_s2f, @fut_s3m, @fut_s3f, @fut_p1, @fut_p2m, @fut_p2f, @fut_p3m, @fut_p3f,
+    @imp_s1, @imp_s2m, @imp_s2f, @imp_s3m, @imp_s3f, @imp_p1, @imp_p2m, @imp_p2f, @imp_p3m, @imp_p3f,
+    @inf
+);
