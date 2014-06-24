@@ -29,16 +29,16 @@ FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n'
 LOAD DATA LOCAL INFILE "tables.csv" INTO TABLE tables CHARSET utf8
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES
 (table_id,
-    @pas_s1m, @pas_s1f, @pas_s2m, @pas_s2f, @pas_s3m, @pas_s3f, @pas_p1m, @pas_p1f, @pas_p2m, @pas_p2f, @pas_p3m, @pas_p3f,
-    @pre_s1,            @pre_s2m, @pre_s2f, @pre_s3m, @pre_s3f, @pre_p1,            @pre_p2m, @pre_p2f, @pre_p3m, @pre_p3f,
+    @pre_s1m, @pre_s1f, @pre_s2m, @pre_s2f, @pre_s3m, @pre_s3f, @pre_p1m, @pre_p1f, @pre_p2m, @pre_p2f, @pre_p3m, @pre_p3f,
+    @pas_s1,            @pas_s2m, @pas_s2f, @pas_s3m, @pas_s3f, @pas_p1,            @pas_p2m, @pas_p2f, @pas_p3m, @pas_p3f,
     @fut_s1,            @fut_s2m, @fut_s2f, @fut_s3m, @fut_s3f, @fut_p1,            @fut_p2m, @fut_p2f, @fut_p3m, @fut_p3f,
                         @imp_s2m, @imp_s2f,                                         @imp_p2m, @imp_p2f,
     @inf
 ) SET table_rule = CONCAT_WS(',',
-    CONCAT(@pas_s1m, '<br />', @pas_s1f),
-                        @pas_s2m, @pas_s2f, @pas_s3m, @pas_s3f, CONCAT(@pas_p1m, '<br />', @pas_p1f),
-                                                                                    @pas_p2m, @pas_p2f, @pas_p3m, @pas_p3f,
-    @pre_s1,            @pre_s2m, @pre_s2f, @pre_s3m, @pre_s3f, @pre_p1,            @pre_p2m, @pre_p2f, @pre_p3m, @pre_p3f,
+    CONCAT(@pre_s1m, '<br />', @pre_s1f),
+                        @pre_s2m, @pre_s2f, @pre_s3m, @pre_s3f, CONCAT(@pre_p1m, '<br />', @pre_p1f),
+                                                                                    @pre_p2m, @pre_p2f, @pre_p3m, @pre_p3f,
+    @pas_s1,            @pas_s2m, @pas_s2f, @pas_s3m, @pas_s3f, @pas_p1,            @pas_p2m, @pas_p2f, @pas_p3m, @pas_p3f,
     @fut_s1,            @fut_s2m, @fut_s2f, @fut_s3m, @fut_s3f, @fut_p1,            @fut_p2m, @fut_p2f, @fut_p3m, @fut_p3f,
     '',                 @imp_s2m, @imp_s2f, '',       '',       '',                 @imp_p2m, @imp_p2f, '',       '',
     @inf
