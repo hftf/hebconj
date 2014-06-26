@@ -160,7 +160,7 @@ if ($hspell_on) {
             $class .= ' hspell-nomatch';
           $meat = $my_conjugated_color;
           if ($hspell_on)
-            $meat = '<span class=\"a\">" . $meat . "</span><span class=\"b\">" . $hspell_conjugated . "</span>';
+            $meat = "<span class=\"a\">" . $meat . "</span><span class=\"b\">" . $hspell_conjugated . "</span>";
           echo "    <td id=\"v$tense_index$pron_index\" class=\"" . $class . "\" title=\"" . str_replace('<br />',"\n",$devocalized_my_conjugated) . "\">$meat</td>\n";
         }
        echo "   </tr>\n";
