@@ -58,7 +58,7 @@ LOAD DATA LOCAL INFILE "tenses.csv" INTO TABLE tenses CHARSET utf8
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 LOAD DATA LOCAL INFILE "tables.csv" INTO TABLE tables CHARSET utf8
 FIELDS TERMINATED BY ',' ENCLOSED BY '"' ESCAPED BY '"' LINES TERMINATED BY '\n' IGNORE 1 LINES
-SET table_rule = CONCAT_WS(',',
+SET table_rule = CONCAT_WS('|',
     CONCAT(pre_sm, '<br />', pre_sf),
                       pre_sm,  pre_sf,  pre_sm,  pre_sf,  CONCAT(pre_pm, '<br />', pre_pf),
                                                                             pre_pm,  pre_pf,  pre_pm,  pre_pf,
