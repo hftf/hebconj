@@ -1,8 +1,8 @@
-http://www.cs.technion.ac.il/~erelsgl/java1/milon/tavniot.ma
+http://tora.us.fm/bxi/hmntx/milon/tavniot.ma
 
 http://www.code972.com/blog/hebmorph/
 
-https://github.com/synhershko/HebMorph/blob/master/java/hebmorph/src/hebmorph/LookupTolerators.java
+https://github.com/synhershko/HebMorph/blob/master/java/hebmorph-core/src/main/java/com/code972/hebmorph/LookupTolerators.java
 
 http://hebrew-academy.huji.ac.il/hahlatot/MissingVocalizationSpelling/Pages/ikkar.aspx
 
