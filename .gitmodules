@@ -1,0 +1,3 @@
+[submodule "colorful-diacritics"]
+	path = colorful-diacritics
+	url = git://github.com/hftf/colorful-diacritics
